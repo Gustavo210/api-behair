@@ -64,6 +64,11 @@ class EstablishmentController {
         const establishmentsRepository = getCustomRepository(EstablishmentsRepository)
         try {
             const establishment = await establishmentsRepository.findOneOrFail({ where: { id_responsible }, relations: ["products"] })
+
+            establishment.products = establishment.products.map(product => {
+                product.cost = (Number(product.cost) / 100)
+                return product
+            })
             res.status(200).json(establishment);
         } catch (error) {
             res.status(400).json({ message: error });

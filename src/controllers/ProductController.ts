@@ -45,6 +45,42 @@ class ProductController {
             return res.status(400).json({ message: "Error to create a product" })
         }
     }
+    async delete(req: Request, res: Response) {
+        const id = req.params.id as string
+
+        const productRepository = getCustomRepository(ProductsRepository)
+        try {
+            await productRepository.delete(id)
+            res.status(200).json({ message: "Product has been deleted" });
+        } catch (error) {
+            res.status(400).json({ message: "Product not found" });
+
+        }
+
+    }
+    async update(req: Request, res: Response) {
+        const id = req.params.id as string
+        const { name, photo, description, cost } = req.body
+
+        const productRepository = getCustomRepository(ProductsRepository)
+        try {
+            const product = await productRepository.findOneOrFail(id)
+            await productRepository.save({
+                cost: (Number(cost) * 100),
+                name,
+                photo,
+                description,
+                id: product.id
+            })
+            const productUpdated = await productRepository.findOneOrFail(id)
+            productUpdated.cost = (Number(productUpdated.cost) / 100)
+            res.status(200).json(productUpdated);
+        } catch (error) {
+            res.status(400).json({ message: "Product not found" });
+
+        }
+
+    }
     async findOne(req: Request, res: Response) {
         const id = req.params.id as string
 
@@ -69,7 +105,11 @@ class ProductController {
                     id_establishment
                 }
             })
-            res.status(200).json(products);
+            const listProduct = products.map(product => {
+                product.cost = (Number(product.cost) / 100)
+                return product
+            })
+            res.status(200).json(listProduct);
         } catch (error) {
             res.status(400).json({ message: "products not found" });
 
