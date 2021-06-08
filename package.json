@@ -4,7 +4,7 @@
   "main": "dist/server.js",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "set NODE_ENV=production&& node dist/server.js",
     "dev": "tsnd --inspect --transpile-only --ignore-watch node_modules src/server.ts",
     "prod": "set NODE_ENV=production&& tsnd --inspect --transpile-only --ignore-watch node_modules dist/server.js",
     "build": "tsc",
