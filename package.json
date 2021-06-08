@@ -1,11 +1,12 @@
 {
-  "name": "api-behear",
+  "name": "api-be-hair",
   "version": "1.0.0",
   "main": "dist/server.js",
   "license": "MIT",
   "scripts": {
     "start": "node dist/server.js",
     "dev": "tsnd --inspect --transpile-only --ignore-watch node_modules src/server.ts",
+    "prod": "set NODE_ENV=production&& tsnd --inspect --transpile-only --ignore-watch node_modules dist/server.js",
     "build": "tsc",
     "typeorm": "tsnd ./node_modules/typeorm/cli.js",
     "test": "set NODE_ENV=test&& jest -i"

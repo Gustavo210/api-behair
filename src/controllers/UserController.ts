@@ -110,7 +110,8 @@ class UserController {
             longitude,
             name: establishmentName,
             init_hours: initHours,
-            final_hours: finalHours
+            final_hours: finalHours,
+            photo:URLPhoto
         })
 
         try {

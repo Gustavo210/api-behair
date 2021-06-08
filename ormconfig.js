@@ -1,21 +1,14 @@
 module.exports = [
   {
     name: "default",
-    type: process.env.SERVER_TYPE,
-    url: process.env.DATABASE_URL,
-    host: process.env.SERVER_HOST,
-    port: process.env.SERVER_PORT,
-    username: process.env.SERVER_USERNAME,
-    password: process.env.SERVER_PASSWORD,
-    database: process.env.SERVER_DATABASE,
-    migrations: [process.env.SERVER_MIGRATIONS],
-    entities: [process.env.SERVER_ENTITIES],
-    ssl: {
-      rejectUnauthorized: false,
-      ca: "",
-      key: "",
-      cert: "",
-    },
+    type: "postgres",
+    host: process.env.LOCAL_SERVER_HOST,
+    port: process.env.LOCAL_SERVER_PORT,
+    username: process.env.LOCAL_SERVER_USERNAME,
+    password: process.env.LOCAL_SERVER_PASSWORD,
+    database: process.env.LOCAL_SERVER_DATABASE,
+    migrations: [process.env.LOCAL_SERVER_MIGRATIONS],
+    entities: [process.env.LOCAL_SERVER_ENTITIES],
     cli: {
       migrationsDir: process.env.SERVER_MIGRATIONS_DIR,
     },
@@ -23,13 +16,8 @@ module.exports = [
   },
   {
     name: "production",
-    type: process.env.SERVER_TYPE,
-    // url: process.env.DATABASE_URL,
-    host: process.env.SERVER_HOST,
-    port: process.env.SERVER_PORT,
-    username: process.env.SERVER_USERNAME,
-    password: process.env.SERVER_PASSWORD,
-    database: process.env.SERVER_DATABASE,
+    type: "postgres",
+    url: process.env.DATABASE_URL,
     ssl: {
       rejectUnauthorized: false,
       ca: "",
@@ -47,12 +35,11 @@ module.exports = [
     name: "test",
     type: 'sqlite',
     database: './src/database/test/behear.test.sqlite',
-    migrations: [process.env.SERVER_MIGRATIONS],
-    entities: [process.env.SERVER_ENTITIES],
+    migrations: [process.env.LOCAL_SERVER_MIGRATIONS],
+    entities: [process.env.LOCAL_SERVER_ENTITIES],
     cli: {
       migrationsDir: process.env.SERVER_MIGRATIONS_DIR,
     },
   }
 ]
-  
-  
+
