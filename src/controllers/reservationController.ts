@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { getCustomRepository, In } from "typeorm";
 import * as yup from "yup";
+import Establishment from "../entities/Establishment";
+import Product from "../entities/Product";
 import { ProductsRepository } from "../repositorys/ProductsRepository";
 import { ReservationsRepository } from "../repositorys/ReservationsRepository";
 
@@ -16,7 +18,7 @@ class ReservationController {
 
         const schema = yup.object().shape({
             name: yup.string().min(2).required("Name is required"),
-            phone: yup.string().min(11, "minimal length is 11").required("phone is required"),
+            phone: yup.string().min(9, "minimal length is 11").required("phone is required"),
             note: yup.string(),
             created_at: yup.string(),
             id_product: yup.string().required("Id product is required")
@@ -25,7 +27,7 @@ class ReservationController {
         try {
             await schema.validate(req.body, { abortEarly: false });
         } catch (error) {
-            return res.status(400).json({ message: "Invalid arguments" })
+            return res.status(400).json({ message: "Invalid arguments", error })
         }
 
         const productRepository = getCustomRepository(ProductsRepository)
@@ -125,6 +127,37 @@ class ReservationController {
             res.status(200).json({ message: "Reservation has accept by Establishment" });
         } catch (error) {
             res.status(400).json({ message: "Reservation not found" });
+
+        }
+
+    }
+    async findProductsPerReservation(req: Request, res: Response) {
+        const phone = req.params.phone as string
+        try {
+            const reservationRepository = getCustomRepository(ReservationsRepository)
+
+            const products = await reservationRepository.createQueryBuilder("reservations")
+                .innerJoin(Product, "products", "products.id = reservations.id_product")
+                .innerJoin(Establishment, "establishments", "establishments.id = products.id_establishment")
+                .where(`reservations.phone = '${ phone }'`)
+                .select(["products.photo as photo",
+                    "establishments.name as establishment",
+                    "products.name as name",
+                    "products.cost as cost",
+                    "products.id as id",
+                    "products.description as description",
+                    "establishments.latitude as latitude",
+                    "reservations.created_at as data",
+                    "establishments.longitude as longitude"])
+                .orderBy("products.created_at", "DESC")
+                .execute()
+            const listProduct = products.map((product: any) => {
+                product.cost = (Number(product.cost) / 100)
+                return product
+            })
+            return res.status(200).json(listProduct);
+        } catch (error) {
+            return res.status(400).json({ message: "products not found", error });
 
         }
 
