@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
 import * as yup from "yup";
+import Establishment from "../entities/Establishment";
 import { ProductsRepository } from "../repositorys/ProductsRepository";
 
 class ProductController {
@@ -115,6 +116,62 @@ class ProductController {
 
         }
 
+    }
+    async findNewProducts(req: Request, res: Response) {
+
+        try {
+            const productRepository = getCustomRepository(ProductsRepository)
+
+            const products = await productRepository.createQueryBuilder("products")
+                .innerJoin(Establishment, "establishments", "establishments.id = products.id_establishment")
+                .select(["products.photo as photo",
+                    "establishments.name as establishment",
+                    "products.name as name",
+                    "products.cost as cost",
+                    "products.id as id",
+                    "products.description as description",
+                    "establishments.latitude as latitude",
+                    "establishments.longitude as longitude"])
+                .orderBy("products.created_at", "DESC")
+                .execute()
+            const listProduct = products.map((product: any) => {
+                product.cost = (Number(product.cost) / 100)
+                return product
+            })
+            return res.status(200).json(listProduct);
+        } catch (error) {
+            return res.status(400).json({ message: "products not found", error });
+
+        }
+
+    }
+    async findProductsQuery(req: Request, res: Response) {
+        const { search } = req.query
+        try {
+            const productRepository = getCustomRepository(ProductsRepository)
+
+            const products = await productRepository.createQueryBuilder("products")
+                .innerJoin(Establishment, "establishments", "establishments.id = products.id_establishment")
+                .where(`LOWER(products.name) LIKE LOWER('%${ search }%') OR LOWER(establishments.name) LIKE LOWER('%${ search }%') OR LOWER(products.description) LIKE LOWER('%${ search }%')`)
+                .select(["products.photo as photo",
+                    "establishments.name as establishment",
+                    "products.id as id",
+                    "products.name as name",
+                    "products.cost as cost",
+                    "products.description as description",
+                    "establishments.latitude as latitude",
+                    "establishments.longitude as longitude"])
+                .orderBy("products.created_at", "DESC")
+                .execute()
+            const listProduct = products.map((product: any) => {
+                product.cost = (Number(product.cost) / 100)
+                return product
+            })
+            return res.status(200).json(listProduct);
+        } catch (error) {
+            return res.status(400).json({ message: "products not found", error });
+
+        }
     }
 }
 
