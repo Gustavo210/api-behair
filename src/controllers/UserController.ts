@@ -104,6 +104,11 @@ class UserController {
         const establishmentRepository = getCustomRepository(EstablishmentsRepository)
         const id_responsible = user.id as any
 
+        const existsEstablishment = await establishmentRepository.find({ latitude, longitude })
+        if (existsEstablishment.length !== 0) {
+            return res.status(400).json({ message: "In this place there is already an establishment." })
+        }
+
         const establishment = establishmentRepository.create({
             id_responsible,
             latitude,
@@ -111,7 +116,7 @@ class UserController {
             name: establishmentName,
             init_hours: initHours,
             final_hours: finalHours,
-            photo:URLPhoto
+            photo: URLPhoto
         })
 
         try {
