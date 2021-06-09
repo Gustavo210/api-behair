@@ -16,12 +16,14 @@ routes.get("/establishments/reservations/:id_establishment", reservationControll
 
 routes.post("/products", ProductController.create)
 routes.get("/products/all/:id_establishment", ProductController.findAll)
+routes.get("/products/all", ProductController.findNewProducts)
+routes.get("/products/search", ProductController.findProductsQuery)
 routes.get("/products/:id", ProductController.findOne)
 routes.put("/products/:id", ProductController.update)
 routes.delete("/products/:id", ProductController.delete)
 
 routes.post("/reservations", reservationController.create)
-routes.get("/reservations/:phone", reservationController.findAll)
+routes.get("/reservations/:phone", reservationController.findProductsPerReservation)
 routes.put("/reservations/accept/:id", reservationController.acceptReservation)
 
 export default routes
