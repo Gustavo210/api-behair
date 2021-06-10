@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
 import * as yup from "yup";
+import { resolve } from "path";
 import { EstablishmentsRepository } from "../repositorys/EstablishmentsRepository";
 import { UsersRepository } from "../repositorys/UsersRepository";
 import GenerateHash from "../utils/generateHash";
 import UserView from "../views/userView";
+import SendMailService from "../services/SendMailService";
 
 class UserController {
     async create(req: Request, res: Response) {
@@ -146,6 +148,68 @@ class UserController {
         }
 
 
+    }
+    async forgotPassword(req: Request, res: Response) {
+        const { email } = req.body
+
+        const usersRepository = getCustomRepository(UsersRepository)
+
+        const user = await usersRepository.findOneOrFail({ email })
+        const recover = resolve(__dirname, "..", "views", "emails", "recover.hbs");
+
+        const variables = {
+            name: user.name,
+            link: `${ process.env.BEHAIR_URL_SERVER }/recover/${ user.id }`,
+        };
+        SendMailService.execute(email, "Email de Recuperação", variables, recover);
+
+        return res.status(201).json({ message: "The recovery email has been sent to your address." });
+    }
+    async verify(req: Request, res: Response) {
+        const { uuid } = req.params
+
+        const usersRepository = getCustomRepository(UsersRepository)
+        try {
+
+
+            await usersRepository.findOneOrFail({ id: uuid })
+
+            return res.status(200).json({ message: "User exists" });
+        } catch (error) {
+            return res.status(400).json({ message: "User not found" });
+
+        }
+    }
+    async recover(req: Request, res: Response) {
+        const { uuid } = req.params
+        const { password, confirmPassword } = req.body
+
+        const schema = yup.object().shape({
+            password: yup.string().min(4).required("Password is required"),
+            confirmPassword: yup.string().min(4).required("Confirm password is required"),
+        })
+
+        try {
+            await schema.validate(req.body, { abortEarly: false });
+        } catch (error) {
+            return res.status(400).json({ message: error.errors })
+        }
+
+        const usersRepository = getCustomRepository(UsersRepository)
+
+        const hash = new GenerateHash
+        try {
+            const user = await usersRepository.findOneOrFail({ id: uuid })
+
+            user.password = hash.create(password)
+
+            await usersRepository.save(user)
+
+            return res.status(200).json(user);
+        } catch (error) {
+            return res.status(400).json({ message: "User not found" });
+
+        }
     }
 }
 

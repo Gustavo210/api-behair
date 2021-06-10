@@ -1,0 +1,46 @@
+
+
+<style>
+
+    .container{
+        width: 800px;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .link{
+        padding:10px;
+        margin: 5px;
+        background: #0A3473;
+        color: #fff;
+        border-radius: 2px;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .recover{
+        width: 350px;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+</style>
+
+
+<div class="container">
+    <label >Olá <strong>{{name}}</strong>! </label>
+    <span>Parece que você precisa recuperar sua senha.</span>
+    <br>
+    <strong>Click no link abaixo.</strong>
+    <div class="recover">
+        <a class="link" href="{{link}}">Recuperar</a>
+    </div>
+
+    <br>
+    <br>
+    <h3>Equipe | <strong>BeHair</strong></h3>
+</div>

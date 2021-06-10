@@ -7,7 +7,10 @@ import UserController from "./controllers/UserController";
 const routes = Router();
 
 routes.post("/users", UserController.create)
+routes.post("/users/forgot", UserController.forgotPassword)
 routes.post("/register", UserController.createUserAndEstablishment)
+routes.put("/users/recover/:uuid", UserController.recover)
+routes.get("/users/verify/:uuid", UserController.verify)
 routes.post("/users/login", UserController.login)
 
 routes.post("/establishments", EstablishmentController.create)
