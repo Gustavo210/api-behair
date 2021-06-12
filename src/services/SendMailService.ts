@@ -1,6 +1,5 @@
 import nodemailer, { Transporter } from "nodemailer";
-import fs from "fs";
-import handlebars from "handlebars";
+
 
 class SendMailService {
   private client: Transporter;
@@ -30,22 +29,16 @@ class SendMailService {
     // });
   }
 
-  async execute(to: string, subject: string, variables: object, path: string) {
-    const templateFileContent = fs.readFileSync(path).toString("utf8");
+  async execute(to: string, subject: string, variables: { name: string, link: string }) {
+    const html = `<style> .container{width: 800px;justify-content: center;align-items: center;align-content: center;display: flex;flex-direction: column;}.link{padding:10px;margin: 5px;background: #0A3473;color: #fff;border-radius: 2px;text-align: center;text-decoration: none;}.recover{width: 350px;display:flex;justify-content: center;align-items: center;}</style><div class="container"><label >Olá <strong>${ variables.name }</strong>! </label><span>Parece que você precisa recuperar sua senha.</span><br><strong>Click no link abaixo.</strong><div class="recover"><a class="link" href="${ variables.link }">Recuperar</a></div><br><br><h3>Equipe | <strong>BeHair</strong></h3></div>`;
 
-    const mailtemplateParse = handlebars.compile(templateFileContent);
-
-    const html = mailtemplateParse(variables);
-
-    const message = await this.client.sendMail({
+    await this.client.sendMail({
       to,
       subject,
       html,
       from: "BeHair <noreplay@behair.com.br>",
     });
 
-    // console.log("message sent: %s", message.messageId);
-    // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(message));
   }
 }
 

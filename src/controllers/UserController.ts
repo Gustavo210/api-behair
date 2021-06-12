@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { getCustomRepository } from "typeorm";
 import * as yup from "yup";
-import { resolve } from "path";
 import { EstablishmentsRepository } from "../repositorys/EstablishmentsRepository";
 import { UsersRepository } from "../repositorys/UsersRepository";
 import GenerateHash from "../utils/generateHash";
@@ -155,13 +154,12 @@ class UserController {
         const usersRepository = getCustomRepository(UsersRepository)
 
         const user = await usersRepository.findOneOrFail({ email })
-        const recover = resolve(__dirname, "..", "views", "emails", "recover.hbs");
 
         const variables = {
             name: user.name,
             link: `${ process.env.BEHAIR_URL_SERVER }/recover/${ user.id }`,
         };
-        SendMailService.execute(email, "Email de Recuperação", variables, recover);
+        SendMailService.execute(email, "Email de Recuperação", variables);
 
         return res.status(201).json({ message: "The recovery email has been sent to your address." });
     }
